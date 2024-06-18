@@ -109,4 +109,3 @@ if pdfs_encontrados:
     print("El pdf ha sido convertido")
 else:
     print("No se encontraron archivos PDF para procesar.")
-    

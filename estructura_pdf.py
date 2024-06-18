@@ -7,7 +7,6 @@ def pdfs_dir():
 
 
 def inspect_pdf_structure(pdf_path):
-    print("== Usando PyMuPDF ==")
     # Abre el documento PDF con PyMuPDF
     document = fitz.open(pdf_path)
 
@@ -36,7 +35,6 @@ def inspect_pdf_structure(pdf_path):
     # Cierra el documento
     document.close()
 
-    print("== Usando pdfplumber ==")
     # Abre el documento PDF con pdfplumber
     with pdfplumber.open(pdf_path) as pdf:
         # Itera a través de todas las páginas del documento
