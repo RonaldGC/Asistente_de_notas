@@ -87,10 +87,8 @@ def text_a_md(ruta_pdf, ruta_md):
     with open(ruta_md, 'w', encoding='utf-8') as f:
         for pagina, columnas in text.items():
             f.write(f"# {pagina}\n\n")
-            f.write("## Columna Izquierda\n")
             for parrafo in columnas["columna_izquierda"]:
                 f.write(parrafo + "\n\n")
-            f.write("## Columna Derecha\n")
             for parrafo in columnas["columna_derecha"]:
                 f.write(parrafo + "\n\n")
             f.write("---\n\n")
