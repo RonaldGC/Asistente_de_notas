@@ -1,5 +1,5 @@
 import os
-import re
+import sys
 import pdfplumber 
 
 #Define la ubicacion de la carpeta
@@ -23,15 +23,29 @@ def seleccion_pdf(pdfs):
     for i, pdf in enumerate (pdfs, start=1):
         print(f"{i}. {pdf}")
 
-    while True:
+    pdf = True
+    errores = 0
+
+    while pdf:
         try:
-            seleccionado = int(input("Elige el PDF que que quieras convertir:"))- 1 
+            seleccionado = int(input("Elige el PDF que quieras convertir:"))- 1 
             if 0 <= seleccionado < len(pdfs):
                 return pdfs[seleccionado]
             else:
-                print("Elección invalida, intenta de nuevo")
-        except ValueError:
-            print("Elección invalida, intenta de nuevo")
+                errores += 1
+                print("No se pudo encontrar el número de ese pdf.")
+        except (ValueError, IndexError):
+            errores += 1
+        print("No se pudo encontrar el número de ese pdf.")
+
+        if errores == 3: 
+            respuesta = input("Quieres salir del programa? (si/no):").strip().lower()
+            if respuesta =="si":
+                print('El programa se detuvo')
+                sys.exit()
+            elif respuesta == "no":
+                errores = 0
+                seleccion_pdf(lista_pdfs(pdfs_dir()))  
 
 
 def palabras_dentro_del_parrafo(palabras, umbral_de_linea=3):
@@ -96,6 +110,8 @@ def text_a_md(ruta_pdf, ruta_md):
 directorio_pdfs = pdfs_dir()
 pdfs_encontrados = lista_pdfs(directorio_pdfs)
 
+
+
 if pdfs_encontrados:
     pdf_seleccionado = seleccion_pdf(pdfs_encontrados)
     ruta_pdf = os.path.join(directorio_pdfs, pdf_seleccionado)
@@ -105,5 +121,13 @@ if pdfs_encontrados:
     ruta_md = os.path.join(directorio_pdfs, nombre_md)
     text_a_md(ruta_pdf, ruta_md)
     print("El pdf ha sido convertido")
+    respuesta = input("Quieres salir del programa? (si/no):").strip().lower()
+    if respuesta =="si":
+        print('El programa se detuvo')
+        sys.exit()
+    elif respuesta == "no":
+       errores = 0
+       seleccion_pdf(lista_pdfs(pdfs_dir()))  
+    
 else:
-    print("No se encontraron archivos PDF para procesar.")
+    print("No se encontraron archivos PDF para procesar revisa bien los archivos en la carpeta")
