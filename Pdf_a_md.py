@@ -17,6 +17,8 @@ def lista_pdfs(pdfs):
         print("No se encontraron PDFs en la carpeta.")
     return archivos_pdf
 
+
+
 #Función para seleccionar los pdfs encontrados
 def seleccion_pdf(pdfs):
     print("Estos fueron los PDFs encontrados, ingresa el numero del pfd seleccionado")
@@ -39,13 +41,19 @@ def seleccion_pdf(pdfs):
         print("No se pudo encontrar el número de ese pdf.")
 
         if errores == 3: 
-            respuesta = input("Quieres salir del programa? (si/no):").strip().lower()
-            if respuesta =="si":
-                print('El programa se detuvo')
-                sys.exit()
-            elif respuesta == "no":
-                errores = 0
-                seleccion_pdf(lista_pdfs(pdfs_dir()))  
+            salir_del_programa() 
+
+def salir_del_programa():
+    respuesta = input("Quieres salir del programa? (Si/No):").strip().lower()
+    if respuesta =="si":
+        print('El programa se detuvo')
+        sys.exit()
+    elif respuesta == "no":
+       errores = 0
+       seleccion_pdf(lista_pdfs(pdfs_dir())) 
+    else:
+        print("La respuesta que diste es invalida, responde solamente con un Si o  un No ")
+        return salir_del_programa()
 
 
 def palabras_dentro_del_parrafo(palabras, umbral_de_linea=3):
@@ -107,10 +115,9 @@ def text_a_md(ruta_pdf, ruta_md):
                 f.write(parrafo + "\n\n")
             f.write("---\n\n")
 
+
 directorio_pdfs = pdfs_dir()
 pdfs_encontrados = lista_pdfs(directorio_pdfs)
-
-
 
 if pdfs_encontrados:
     pdf_seleccionado = seleccion_pdf(pdfs_encontrados)
@@ -121,13 +128,6 @@ if pdfs_encontrados:
     ruta_md = os.path.join(directorio_pdfs, nombre_md)
     text_a_md(ruta_pdf, ruta_md)
     print("El pdf ha sido convertido")
-    respuesta = input("Quieres salir del programa? (si/no):").strip().lower()
-    if respuesta =="si":
-        print('El programa se detuvo')
-        sys.exit()
-    elif respuesta == "no":
-       errores = 0
-       seleccion_pdf(lista_pdfs(pdfs_dir()))  
-    
+    salir_del_programa()  
 else:
     print("No se encontraron archivos PDF para procesar revisa bien los archivos en la carpeta")
