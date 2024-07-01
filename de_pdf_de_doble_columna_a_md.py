@@ -17,8 +17,6 @@ def lista_pdfs(pdfs):
         print("No se encontraron PDFs en la carpeta.")
     return archivos_pdf
 
-
-
 #Función para seleccionar los pdfs encontrados
 def seleccion_pdf(pdfs):
     print("Estos fueron los PDFs encontrados, ingresa el numero del pfd seleccionado")
