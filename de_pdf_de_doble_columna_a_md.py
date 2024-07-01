@@ -34,24 +34,26 @@ def seleccion_pdf(pdfs):
             else:
                 errores += 1
                 print("No se pudo encontrar el número de ese pdf.")
+                salir_del_programa("")
         except (ValueError, IndexError):
             errores += 1
         print("No se pudo encontrar el número de ese pdf.")
+        salir_del_programa("")
+        if errores == 2: 
+            salir_del_programa("") 
 
-        if errores == 3: 
-            salir_del_programa() 
-
-def salir_del_programa():
+def salir_del_programa(respuesta):
     respuesta = input("Quieres salir del programa? (Si/No):").strip().lower()
-    if respuesta =="si":
-        print('El programa se detuvo')
-        sys.exit()
-    elif respuesta == "no":
-       errores = 0
-       seleccion_pdf(lista_pdfs(pdfs_dir())) 
-    else:
-        print("La respuesta que diste es invalida, responde solamente con un Si o  un No ")
-        return salir_del_programa()
+    match respuesta:
+        case "si":
+            print('El programa se detuvo')
+            sys.exit()
+        case "no":
+            errores = 0
+            seleccion_pdf(lista_pdfs(pdfs_dir()))
+        case _:
+            print("La respuesta que diste es invalida, responde solamente con un Si o  un No ")
+            salir_del_programa(respuesta)
 
 
 def palabras_dentro_del_parrafo(palabras, umbral_de_linea=3):
