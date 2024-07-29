@@ -60,11 +60,18 @@ def palabras_dentro_del_parrafo(palabras, umbral_de_linea=3):
     parrafo = []
     parrafo_actual = []
     ultima_abajo = None
+    primera_palabra_modificada = False
 
     for palabra in palabras:
         if ultima_abajo is not None and (palabra['top'] - ultima_abajo) >umbral_de_linea:
             parrafo.append(" ".join([w['text'] for w in parrafo_actual]))
             parrafo_actual = []
+            primera_palabra_modificada = False
+       
+        if not primera_palabra_modificada and palabra['height'] == 20:
+                    palabra['text'] = '# ' + palabra['text']
+                    primera_palabra_modificada = True  # Marcar que ya se ha modificado la primera palabra
+
         parrafo_actual.append(palabra)
         ultima_abajo = palabra['bottom']
 
@@ -108,12 +115,12 @@ def text_a_md(ruta_pdf, ruta_md):
     text = extractor_y_agrupamiento_del_text(ruta_pdf)
     with open(ruta_md, 'w', encoding='utf-8') as f:
         for pagina, columnas in text.items():
-            f.write(f"# {pagina}\n\n")
+            f.write("---\n\n")
             for parrafo in columnas["columna_izquierda"]:
                 f.write(parrafo + "\n\n")
             for parrafo in columnas["columna_derecha"]:
                 f.write(parrafo + "\n\n")
-            f.write("---\n\n")
+            
 
 
 directorio_pdfs = pdfs_dir()
@@ -128,6 +135,6 @@ if pdfs_encontrados:
     ruta_md = os.path.join(directorio_pdfs, nombre_md)
     text_a_md(ruta_pdf, ruta_md)
     print("El pdf ha sido convertido")
-    salir_del_programa()  
+    salir_del_programa("")  
 else:
     print("No se encontraron archivos PDF para procesar revisa bien los archivos en la carpeta")
