@@ -56,21 +56,28 @@ def salir_del_programa(respuesta):
             salir_del_programa(respuesta)
 
 
-def palabras_dentro_del_parrafo(palabras, umbral_de_linea=3):
+def palabras_dentro_del_parrafo(palabras, umbral_de_linea=3, umbral_de_altura=20):
     parrafo = []
     parrafo_actual = []
     ultima_abajo = None
     primera_palabra_modificada = False
 
     for palabra in palabras:
-        if ultima_abajo is not None and (palabra['top'] - ultima_abajo) >umbral_de_linea:
+        if ultima_abajo is not None and (palabra['top'] - ultima_abajo) > umbral_de_linea:
             parrafo.append(" ".join([w['text'] for w in parrafo_actual]))
             parrafo_actual = []
-            primera_palabra_modificada = False
-       
-        if not primera_palabra_modificada and palabra['height'] == 20:
-                    palabra['text'] = '# ' + palabra['text']
-                    primera_palabra_modificada = True  # Marcar que ya se ha modificado la primera palabra
+            primera_palabra_modificada = False  # Resetear la bandera para el siguiente párrafo
+
+        if '•' in palabra['text']:
+            palabra['text'] = palabra['text'].replace('•', '- ')
+
+        # Modificar la palabra si su altura es mayor al umbral_de_altura y aún no se ha modificado ninguna palabra en este párrafo
+        if palabra['height'] >= umbral_de_altura:
+            if not primera_palabra_modificada:
+                palabra['text'] = "--- \n" + "# " + palabra['text'].capitalize()
+                primera_palabra_modificada = True  # Marcar que ya se ha modificado la primera palabra
+            else:
+                palabra['text'] = palabra['text'].lower()
 
         parrafo_actual.append(palabra)
         ultima_abajo = palabra['bottom']
@@ -115,7 +122,6 @@ def text_a_md(ruta_pdf, ruta_md):
     text = extractor_y_agrupamiento_del_text(ruta_pdf)
     with open(ruta_md, 'w', encoding='utf-8') as f:
         for pagina, columnas in text.items():
-            f.write("---\n\n")
             for parrafo in columnas["columna_izquierda"]:
                 f.write(parrafo + "\n\n")
             for parrafo in columnas["columna_derecha"]:
