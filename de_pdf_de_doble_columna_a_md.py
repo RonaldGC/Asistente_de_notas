@@ -50,7 +50,15 @@ def salir_del_programa(respuesta):
             sys.exit()
         case "no":
             errores = 0
-            seleccion_pdf(lista_pdfs(pdfs_dir()))
+            pdf_seleccionado = seleccion_pdf(pdfs_encontrados)
+            ruta_pdf = os.path.join(directorio_pdfs, pdf_seleccionado)
+
+            # Procesar el archivo PDF y guardar como Markdown
+            nombre_md = os.path.basename(ruta_pdf).replace('.pdf', '.md')
+            ruta_md = os.path.join(directorio_pdfs, nombre_md)
+            text_a_md(ruta_pdf, ruta_md)
+            print("El pdf ha sido convertido")
+            salir_del_programa("")  
         case _:
             print("La respuesta que diste es invalida, responde solamente con un Si o  un No ")
             salir_del_programa(respuesta)
