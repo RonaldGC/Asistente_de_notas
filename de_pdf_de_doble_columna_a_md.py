@@ -50,13 +50,44 @@ def salir_del_programa(respuesta):
             sys.exit()
         case "no":
             errores = 0
-            seleccion_pdf(lista_pdfs(pdfs_dir()))
+            pdf_seleccionado = seleccion_pdf(pdfs_encontrados)
+            ruta_pdf = os.path.join(directorio_pdfs, pdf_seleccionado)
+
+            # Procesar el archivo PDF y guardar como Markdown
+            nombre_md = os.path.basename(ruta_pdf).replace('.pdf', '.md')
+            ruta_md = os.path.join(directorio_pdfs, nombre_md)
+            text_a_md(ruta_pdf, ruta_md)
+            print("El pdf ha sido convertido")
+            salir_del_programa("")  
         case _:
             print("La respuesta que diste es invalida, responde solamente con un Si o  un No ")
             salir_del_programa(respuesta)
 
+def preguntar_paginas_a_ignorar(total_paginas):
+    paginas_a_ignorar = []
+    print(f"El documento tiene {total_paginas} páginas.")
+    while True:
+        respuesta = input("¿Desea ignorar alguna página? (Si/No): ").strip().lower()
+        if respuesta == 'no':
+            break
+        elif respuesta == 'si':
+            paginas = input(f"Ingrese los números de página a ignorar separados por espacios (1-{total_paginas}): ").strip()
+            paginas_lista = paginas.split()
+            for num_pagina in paginas_lista:
+                if num_pagina.isdigit():
+                    num_pagina = int(num_pagina)
+                    if 1 <= num_pagina <= total_paginas:
+                        paginas_a_ignorar.append(num_pagina)
+                    else:
+                        print(f"Número de página inválido: {num_pagina}. Por favor ingrese un número entre 1 y {total_paginas}.")
+                else:
+                    print(f"Entrada inválida: {num_pagina}. Por favor ingrese números válidos.")
+        else:
+            print("Respuesta inválida. Por favor ingrese 's' para sí o 'n' para no.")
+    return paginas_a_ignorar
 
-def palabras_dentro_del_parrafo(palabras, umbral_de_linea=3, umbral_de_altura=20):
+
+def palabras_dentro_del_parrafo(palabras, umbral_de_linea=3, umbral_de_altura=18):
     parrafo = []
     parrafo_actual = []
     ultima_abajo = None
@@ -74,7 +105,7 @@ def palabras_dentro_del_parrafo(palabras, umbral_de_linea=3, umbral_de_altura=20
         # Modificar la palabra si su altura es mayor al umbral_de_altura y aún no se ha modificado ninguna palabra en este párrafo
         if palabra['height'] >= umbral_de_altura:
             if not primera_palabra_modificada:
-                palabra['text'] = "--- \n" + "# " + palabra['text'].capitalize()
+                palabra['text'] = "## " + palabra['text'].capitalize()
                 primera_palabra_modificada = True  # Marcar que ya se ha modificado la primera palabra
             else:
                 palabra['text'] = palabra['text'].lower()
@@ -102,7 +133,14 @@ def dividir_en_columnas(palabras, umbral_de_columna):
 def extractor_y_agrupamiento_del_text(ruta_pdf, umbral_de_columna=300):
     resultado = {}
     with pdfplumber.open(ruta_pdf) as pdf:
+        total_paginas = len(pdf.pages)
+        paginas_a_ignorar = preguntar_paginas_a_ignorar(total_paginas)
+        
         for numero_de_pag, pagina in enumerate(pdf.pages):
+            if (numero_de_pag + 1) in paginas_a_ignorar:
+                print(f"Ignorando la página {numero_de_pag + 1}")
+                continue
+
             palabras = pagina.extract_words()
 
             # Dividir palabras en dos columnas
